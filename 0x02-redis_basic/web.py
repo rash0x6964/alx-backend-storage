@@ -8,6 +8,7 @@ import functools
 
 redis_client = redis.Redis()
 
+
 def cache_and_track(method):
     """ Decorator to cache the result of a method and track URL access. """
 
@@ -29,10 +30,10 @@ def cache_and_track(method):
 
     return wrapper
 
+
 @cache_and_track
 def get_page(url: str) -> str:
     """ Fetch the HTML content of a URL. """
 
     response = requests.get(url)
-    response.raise_for_status()
     return response.text

@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
 """ Redis module """
 
+import functools
 from typing import Callable, Optional, Union
 from uuid import uuid4
 import redis
 
 UnionOfTypes = Union[str, bytes, int, float]
+
+
+def count_calls(method: Callable) -> Callable:
+    """ Decorator to count the number of times a method is called. """
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """ Wrap """
+
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -17,6 +31,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: UnionOfTypes) -> str:
         """ Store the input data in Redis using the random key """
 

@@ -9,6 +9,24 @@ import redis
 UnionOfTypes = Union[str, bytes, int, float]
 
 
+def call_history(method: Callable) -> Callable:
+    """ Decorator to store the history of inputs and outputs of a function. """
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """ Wrap """
+        input_key = f"{method.__qualname__}:inputs"
+        output_key = f"{method.__qualname__}:outputs"
+
+        self._redis.rpush(input_key, str(args))
+        output = method(self, *args, **kwargs)
+        self._redis.rpush(output_key, str(output))
+
+        return output
+
+    return wrapper
+
+
 def count_calls(method: Callable) -> Callable:
     """ Decorator to count the number of times a method is called. """
 
@@ -32,6 +50,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: UnionOfTypes) -> str:
         """ Store the input data in Redis using the random key """
 

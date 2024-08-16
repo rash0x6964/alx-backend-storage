@@ -14,9 +14,9 @@ def cache_and_track(method):
 
     @functools.wraps(method)
     def wrapper(url: str, *args, **kwargs):
-        cache_key = "cache:{}".format(url)
+        cache_key = url
         count_key = "count:{}".format(url)
-        print(cache_key, " | ",count_key)
+        print(cache_key, " | ", count_key)
 
         cached_result = redis_client.get(cache_key)
         if cached_result:

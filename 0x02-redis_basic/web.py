@@ -14,7 +14,7 @@ def cache_and_track(method):
 
     @functools.wraps(method)
     def wrapper(url: str, *args, **kwargs):
-        cache_key = f"cache:{url}"
+        cache_key = url
         count_key = f"count:{url}"
         print(cache_key, " | ", count_key)
 
